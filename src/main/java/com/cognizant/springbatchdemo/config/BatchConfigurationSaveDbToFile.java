@@ -1,30 +1,25 @@
 package com.cognizant.springbatchdemo.config;
 
-import javax.activation.DataSource;
+
+import javax.sql.DataSource;
 
 import com.cognizant.springbatchdemo.model.Product;
-import com.cognizant.springbatchdemo.repository.ProductRepository;
 
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.core.launch.support.SimpleJobLauncher;
-import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
-import org.springframework.batch.item.file.mapping.DefaultLineMapper;
-import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
+import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 @Configuration
 public class BatchConfigurationSaveDbToFile {
@@ -35,64 +30,40 @@ public class BatchConfigurationSaveDbToFile {
     @Autowired
     JobBuilderFactory jobBuilderFactory;
 
-    @Autowired
-    ProductRepository productRepository;
-
     @Bean
-    public ConfigJobListener listener() {
-        return new ConfigJobListener();
+    public Job saveDbToFile(Step step2, JobExecutionListener listener2) {
+        return jobBuilderFactory.get("saveDbToFile").incrementer(new RunIdIncrementer()).listener(listener2)
+                .start(step2).build();
     }
 
     @Bean
-    public Step step1(ItemReader<Product> reader, ItemProcessor<Product, Product> processor,
-            ItemWriter<Product> writer) {
-        return stepBuilderFactory.get("step1").<Product, Product>chunk(500).reader(reader).processor(processor)
-                .writer(writer).build();
+    public Step step2(ItemReader<Product> reader2, ItemProcessor<Product, Product> processor2,
+            ItemWriter<Product> writer2) {
+        return stepBuilderFactory.get("step2").<Product, Product>chunk(500).reader(reader2).processor(processor2)
+                .writer(writer2).build();
     }
 
     @Bean
-    public Job saveFileToDb(Step step1) {
-        return jobBuilderFactory.get("saveFileToDb").incrementer(new RunIdIncrementer()).listener(listener())
-                .start(step1).build();
+    public ItemReader<Product> reader2(DataSource dataSource) {
+        return new JdbcCursorItemReaderBuilder<Product>().name("jdbc_reader").dataSource(dataSource).fetchSize(500)
+                .sql("Select * from products_batch").beanRowMapper(Product.class).build();
     }
 
     @Bean
-    public ItemReader<Product> reader() {
-        FlatFileItemReader<Product> fileItemReader = new FlatFileItemReader<>();
-        fileItemReader.setResource(new ClassPathResource("csv_data.csv"));
-        fileItemReader.setLinesToSkip(1);
-        DefaultLineMapper<Product> lineMapper = new DefaultLineMapper<>();
-        DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
-        lineTokenizer.setNames("name", "quantity", "price", "availability");
-        BeanWrapperFieldSetMapper<Product> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
-        fieldSetMapper.setTargetType(Product.class);
-        lineMapper.setFieldSetMapper(fieldSetMapper);
-        lineMapper.setLineTokenizer(lineTokenizer);
-        fileItemReader.setLineMapper(lineMapper);
-        fileItemReader.setSaveState(true);
-        return fileItemReader;
-    }
-
-    @Bean
-    public ItemProcessor<Product, Product> processor() {
-        return p -> {
+    public ItemProcessor<Product, Product> processor2() {
+        System.out.println("\n\n");
+        return (p) -> {
+            System.out.println(p.toString());
             return p;
         };
     }
 
     @Bean
-    public ItemWriter<Product> writer() {
-        return (data) -> {
-            productRepository.saveAll(data);
-        };
-    }
-
-    @Bean
-    public JobLauncher jobLauncher1(JobRepository jobRepository) throws Exception {
-        SimpleJobLauncher simpleJobLauncher = new SimpleJobLauncher();
-        simpleJobLauncher.setTaskExecutor(new SimpleAsyncTaskExecutor());
-        simpleJobLauncher.setJobRepository(jobRepository);
-        simpleJobLauncher.afterPropertiesSet();
-        return simpleJobLauncher;
+    public ItemWriter<Product> writer2() throws Exception {
+        return new FlatFileItemWriterBuilder<Product>().name("csv_writer").delimited()
+                .names("name", "quantity", "price", "availability").resource(new ClassPathResource("data_from_db.csv"))
+                .build();
     }
 }
+
+

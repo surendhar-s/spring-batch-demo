@@ -19,25 +19,14 @@ import org.springframework.stereotype.Service;
 public class ProductServiceImpl implements ProductService {
 
     @Autowired
+    Job saveDbToFile;
+    
+    @Autowired
     Job saveFileToDb;
 
     @Autowired
-    Job saveDbToFile;
-
-    @Autowired
     JobLauncher jobLauncher;
-
-    @Override
-    public String saveFileToDb() throws JobExecutionAlreadyRunningException, JobRestartException,
-            JobInstanceAlreadyCompleteException, JobParametersInvalidException {
-        Map<String, JobParameter> parameters = new HashMap<>();
-        parameters.put("time", new JobParameter(System.currentTimeMillis()));
-        JobParameters jobParameters = new JobParameters(parameters);
-        JobExecution jobExecution = jobLauncher.run(saveFileToDb, jobParameters);
-        System.out.println("From file -> db: " + jobExecution.getStatus());
-        return "<h3>Job Running</h3>";
-    }
-
+    
     @Override
     public String saveDbToFile() throws JobExecutionAlreadyRunningException, JobRestartException,
             JobInstanceAlreadyCompleteException, JobParametersInvalidException {
@@ -49,4 +38,14 @@ public class ProductServiceImpl implements ProductService {
         return "<h3>Job Is running.... Check result in target/classes/output.csv file in project directory.</h3>";
     }
 
+    @Override
+    public String saveFileToDb() throws JobExecutionAlreadyRunningException, JobRestartException,
+            JobInstanceAlreadyCompleteException, JobParametersInvalidException {
+        Map<String, JobParameter> parameters = new HashMap<>();
+        parameters.put("time", new JobParameter(System.currentTimeMillis()));
+        JobParameters jobParameters = new JobParameters(parameters);
+        JobExecution jobExecution = jobLauncher.run(saveFileToDb, jobParameters);
+        System.out.println("From file -> db: " + jobExecution.getStatus());
+        return "<h3>Job Running</h3>";
+    }
 }
