@@ -30,8 +30,8 @@ public class BatchConfigurationSaveFileToDb {
     @Autowired
     JobBuilderFactory jobBuilderFactory;
 
-    @Autowired
-    ProductRepository productRepository;
+    // @Autowired
+    // ProductRepository productRepository;
 
     @Bean
     public Step step2(ItemReader<Product> reader2, ItemProcessor<Product, Product> processor2,
@@ -60,7 +60,9 @@ public class BatchConfigurationSaveFileToDb {
     }
 
     @Bean
-    public ItemWriter<Product> writer2() throws Exception{
-        return new FlatFileItemWriterBuilder<Product>().name("csv_writer").delimited().names("name", "quantity", "price", "availability").resource(new ClassPathResource("data_from_db.csv")).build();
+    public ItemWriter<Product> writer2() throws Exception {
+        return new FlatFileItemWriterBuilder<Product>().name("csv_writer").delimited()
+                .names("name", "quantity", "price", "availability").resource(new ClassPathResource("data_from_db.csv"))
+                .build();
     }
 }

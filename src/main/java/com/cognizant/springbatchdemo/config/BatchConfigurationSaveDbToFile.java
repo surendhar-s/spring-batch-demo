@@ -52,8 +52,8 @@ public class BatchConfigurationSaveDbToFile {
 
     @Bean
     public Job saveFileToDb(Step step1) {
-        return jobBuilderFactory.get("saveFileToDb").incrementer(new RunIdIncrementer()).listener(listener()).start(step1)
-                .build();
+        return jobBuilderFactory.get("saveFileToDb").incrementer(new RunIdIncrementer()).listener(listener())
+                .start(step1).build();
     }
 
     @Bean
@@ -81,14 +81,14 @@ public class BatchConfigurationSaveDbToFile {
     }
 
     @Bean
-    public ItemWriter<Product> writer(DataSource dataSource){
-        return (data)->{
+    public ItemWriter<Product> writer() {
+        return (data) -> {
             productRepository.saveAll(data);
         };
     }
 
     @Bean
-    public JobLauncher jobLauncher1(JobRepository jobRepository) throws Exception{
+    public JobLauncher jobLauncher1(JobRepository jobRepository) throws Exception {
         SimpleJobLauncher simpleJobLauncher = new SimpleJobLauncher();
         simpleJobLauncher.setTaskExecutor(new SimpleAsyncTaskExecutor());
         simpleJobLauncher.setJobRepository(jobRepository);

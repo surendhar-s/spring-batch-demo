@@ -24,7 +24,7 @@ public class ProductController {
         return productService.saveFileToDb();
     }
 
-    @GetMapping("/saveDbToFile/{fileName}")
+    @GetMapping("/saveDbToFile")
     public String saveDbToFile() throws JobExecutionAlreadyRunningException, JobRestartException,
             JobInstanceAlreadyCompleteException, JobParametersInvalidException {
         return productService.saveDbToFile();

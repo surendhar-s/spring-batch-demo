@@ -19,10 +19,10 @@ import org.springframework.stereotype.Service;
 public class ProductServiceImpl implements ProductService {
 
     @Autowired
-    Job job1;
+    Job saveFileToDb;
 
     @Autowired
-    Job job2;
+    Job saveDbToFile;
 
     @Autowired
     JobLauncher jobLauncher;
@@ -33,7 +33,7 @@ public class ProductServiceImpl implements ProductService {
         Map<String, JobParameter> parameters = new HashMap<>();
         parameters.put("time", new JobParameter(System.currentTimeMillis()));
         JobParameters jobParameters = new JobParameters(parameters);
-        JobExecution jobExecution = jobLauncher.run(job1, jobParameters);
+        JobExecution jobExecution = jobLauncher.run(saveFileToDb, jobParameters);
         System.out.println("From file -> db: " + jobExecution.getStatus());
         return "<h3>Job Running</h3>";
     }
@@ -44,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
         Map<String, JobParameter> parameters = new HashMap<>();
         parameters.put("time", new JobParameter(System.currentTimeMillis()));
         JobParameters jobParameters = new JobParameters(parameters);
-        JobExecution jobExecution = jobLauncher.run(job2, jobParameters);
+        JobExecution jobExecution = jobLauncher.run(saveDbToFile, jobParameters);
         System.out.println(jobExecution.getStatus());
         return "<h3>Job Is running.... Check result in target/classes/output.csv file in project directory.</h3>";
     }
