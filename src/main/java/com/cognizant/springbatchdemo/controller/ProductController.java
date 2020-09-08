@@ -18,15 +18,21 @@ public class ProductController {
     @Autowired
     public ProductService productService;
 
+    @GetMapping("/saveFileToDb")
+    public String saveFileToDb() throws JobExecutionAlreadyRunningException, JobRestartException,
+            JobInstanceAlreadyCompleteException, JobParametersInvalidException {
+        return productService.saveFileToDb();
+    }
+    
     @GetMapping("/saveDbToFile")
     public String saveDbToFile() throws JobExecutionAlreadyRunningException, JobRestartException,
             JobInstanceAlreadyCompleteException, JobParametersInvalidException {
         return productService.saveDbToFile();
     }
 
-    @GetMapping("/saveFileToDb")
-    public String saveFileToDb() throws JobExecutionAlreadyRunningException, JobRestartException,
+    @GetMapping("/saveDbToDb")
+    public String saveDbToDb() throws JobExecutionAlreadyRunningException, JobRestartException,
             JobInstanceAlreadyCompleteException, JobParametersInvalidException {
-        return productService.saveFileToDb();
+        return productService.saveDbToDb();
     }
 }

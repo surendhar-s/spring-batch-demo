@@ -20,13 +20,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     Job saveDbToFile;
-    
+
     @Autowired
     Job saveFileToDb;
 
     @Autowired
+    Job saveDbToDb;
+
+    @Autowired
     JobLauncher jobLauncher;
-    
+
     @Override
     public String saveDbToFile() throws JobExecutionAlreadyRunningException, JobRestartException,
             JobInstanceAlreadyCompleteException, JobParametersInvalidException {
@@ -34,8 +37,8 @@ public class ProductServiceImpl implements ProductService {
         parameters.put("time", new JobParameter(System.currentTimeMillis()));
         JobParameters jobParameters = new JobParameters(parameters);
         JobExecution jobExecution = jobLauncher.run(saveDbToFile, jobParameters);
-        System.out.println(jobExecution.getStatus());
-        return "<h3>Job Is running.... Check result in target/classes/output.csv file in project directory.</h3>";
+        System.out.println("From db -> file: " + jobExecution.getStatus());
+        return "<h3>Completed transferring data from File to Database</h3>";
     }
 
     @Override
@@ -46,6 +49,17 @@ public class ProductServiceImpl implements ProductService {
         JobParameters jobParameters = new JobParameters(parameters);
         JobExecution jobExecution = jobLauncher.run(saveFileToDb, jobParameters);
         System.out.println("From file -> db: " + jobExecution.getStatus());
-        return "<h3>Job Running</h3>";
+        return "<h3>Completed transferring data from Database to File</h3>";
+    }
+
+    @Override
+    public String saveDbToDb() throws JobExecutionAlreadyRunningException, JobRestartException,
+            JobInstanceAlreadyCompleteException, JobParametersInvalidException {
+        Map<String, JobParameter> parameters = new HashMap<>();
+        parameters.put("time", new JobParameter(System.currentTimeMillis()));
+        JobParameters jobParameters = new JobParameters(parameters);
+        JobExecution jobExecution = jobLauncher.run(saveDbToDb, jobParameters);
+        System.out.println("From db -> db: " + jobExecution.getStatus());
+        return "<h3>Completed transferring data from Database to Database</h3>";
     }
 }

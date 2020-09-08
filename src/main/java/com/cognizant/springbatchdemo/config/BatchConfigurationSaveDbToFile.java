@@ -51,9 +51,7 @@ public class BatchConfigurationSaveDbToFile {
 
     @Bean
     public ItemProcessor<Product, Product> processor2() {
-        System.out.println("\n\n");
         return (p) -> {
-            System.out.println(p.toString());
             return p;
         };
     }

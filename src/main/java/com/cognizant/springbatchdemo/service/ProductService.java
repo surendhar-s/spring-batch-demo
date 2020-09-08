@@ -13,4 +13,7 @@ public interface ProductService {
         public String saveFileToDb() throws JobExecutionAlreadyRunningException, JobRestartException,
                         JobInstanceAlreadyCompleteException, JobParametersInvalidException;
 
+        public String saveDbToDb() throws JobExecutionAlreadyRunningException, JobRestartException,
+                        JobInstanceAlreadyCompleteException, JobParametersInvalidException;
+
 }
