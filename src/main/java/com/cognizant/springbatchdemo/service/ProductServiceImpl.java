@@ -38,7 +38,7 @@ public class ProductServiceImpl implements ProductService {
         JobParameters jobParameters = new JobParameters(parameters);
         JobExecution jobExecution = jobLauncher.run(saveDbToFile, jobParameters);
         System.out.println("From db -> file: " + jobExecution.getStatus());
-        return "<h3>Completed transferring data from File to Database</h3>";
+        return "<h3>Completed transferring data from Database to File</h3>";
     }
 
     @Override
@@ -49,7 +49,7 @@ public class ProductServiceImpl implements ProductService {
         JobParameters jobParameters = new JobParameters(parameters);
         JobExecution jobExecution = jobLauncher.run(saveFileToDb, jobParameters);
         System.out.println("From file -> db: " + jobExecution.getStatus());
-        return "<h3>Completed transferring data from Database to File</h3>";
+        return "<h3>Completed transferring data from File to Database</h3>";
     }
 
     @Override
